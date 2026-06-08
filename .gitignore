@@ -1,0 +1,24 @@
+# Environment
+.env
+.env.local
+.env*.local
+
+# Private build docs
+PROGRESS.md
+CHECKPOINT.md
+
+# Dependencies + build output
+node_modules/
+dist/
+.next/
+
+# Test artifacts
+coverage/
+test-results/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
