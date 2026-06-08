@@ -137,9 +137,11 @@ export interface DetectionWarning {
 }
 
 export interface ProjectDetectionResult {
+  isNodeProject: boolean;
   packageManager: PackageManager;
   detectedFramework: DetectedFramework;
   warnings: DetectionWarning[];
+  packageJsonPath?: string;
 }
 
 export interface RunnerOptions {
