@@ -9,6 +9,7 @@ export * from "./checks/readmeCheck.js";
 export * from "./checks/buildCheck.js";
 export * from "./checks/serverCheck.js";
 export * from "./checks/healthCheck.js";
+export * from "./score/Scorer.js";
 
 /**
  * Returns the current FreshstartCI core package version.

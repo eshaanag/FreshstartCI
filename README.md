@@ -32,6 +32,7 @@ FreshstartCI is under active implementation. The product docs and workspace scaf
 | README command validity        | ✅ Complete    |
 | Build pass check               | ✅ Complete    |
 | Server start and health checks | ✅ Complete    |
+| Scoring engine                 | ✅ Complete    |
 | CLI commands                   | 📋 Planned     |
 | GitHub Action                  | 📋 Planned     |
 | Badge server                   | 📋 Planned     |
