@@ -21,17 +21,18 @@ Existing CI usually starts after a project is already configured. FreshstartCI c
 
 FreshstartCI is under active implementation. The product docs and workspace scaffold are complete; check implementations come next.
 
-| Area                              | Status         |
-| --------------------------------- | -------------- |
-| Product and technical docs        | ✅ Complete    |
-| pnpm workspace tooling            | ✅ Complete    |
-| Core type system                  | ✅ Complete    |
-| Project detector                  | ✅ Complete    |
-| Dependency install check          | ✅ Complete    |
-| Env, README, build, server checks | 📋 Planned     |
-| CLI commands                      | 📋 Planned     |
-| GitHub Action                     | 📋 Planned     |
-| Badge server                      | 📋 Planned     |
+| Area                         | Status         |
+| ---------------------------- | -------------- |
+| Product and technical docs   | ✅ Complete    |
+| pnpm workspace tooling       | ✅ Complete    |
+| Core type system             | ✅ Complete    |
+| Project detector             | ✅ Complete    |
+| Dependency install check     | ✅ Complete    |
+| Env completeness check       | ✅ Complete    |
+| README, build, server checks | 📋 Planned     |
+| CLI commands                 | 📋 Planned     |
+| GitHub Action                | 📋 Planned     |
+| Badge server                 | 📋 Planned     |
 
 ## Planned Usage
 
