@@ -6,6 +6,7 @@ export * from "./lib/astScanner.js";
 export * from "./checks/dependencyCheck.js";
 export * from "./checks/envCheck.js";
 export * from "./checks/readmeCheck.js";
+export * from "./checks/buildCheck.js";
 
 /**
  * Returns the current FreshstartCI core package version.
