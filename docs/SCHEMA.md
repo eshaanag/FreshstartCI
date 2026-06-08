@@ -173,46 +173,76 @@ import { z } from "zod";
 export const PackageManagerSchema = z.enum(["auto", "npm", "yarn", "pnpm", "bun"]);
 
 export const HealthCheckConfigSchema = z.object({
-  enabled: z.boolean({
-    invalid_type_error: "checks.health.enabled must be a boolean"
-  }).default(true),
-  port: z.number({
-    invalid_type_error: "checks.health.port must be a number"
-  }).int().min(1).max(65535).default(3000),
-  path: z.string({
-    invalid_type_error: "checks.health.path must be a string"
-  }).startsWith("/").default("/health"),
-  timeout: z.number({
-    invalid_type_error: "checks.health.timeout must be a number"
-  }).int().positive().default(10000)
+  enabled: z
+    .boolean({
+      invalid_type_error: "checks.health.enabled must be a boolean",
+    })
+    .default(true),
+  port: z
+    .number({
+      invalid_type_error: "checks.health.port must be a number",
+    })
+    .int()
+    .min(1)
+    .max(65535)
+    .default(3000),
+  path: z
+    .string({
+      invalid_type_error: "checks.health.path must be a string",
+    })
+    .startsWith("/")
+    .default("/health"),
+  timeout: z
+    .number({
+      invalid_type_error: "checks.health.timeout must be a number",
+    })
+    .int()
+    .positive()
+    .default(10000),
 });
 
 export const ChecksConfigSchema = z.object({
-  dependencies: z.boolean({
-    invalid_type_error: "checks.dependencies must be a boolean"
-  }).default(true),
-  env: z.boolean({
-    invalid_type_error: "checks.env must be a boolean"
-  }).default(true),
-  build: z.boolean({
-    invalid_type_error: "checks.build must be a boolean"
-  }).default(true),
-  test: z.boolean({
-    invalid_type_error: "checks.test must be a boolean"
-  }).default(true),
-  server: z.boolean({
-    invalid_type_error: "checks.server must be a boolean"
-  }).default(true),
+  dependencies: z
+    .boolean({
+      invalid_type_error: "checks.dependencies must be a boolean",
+    })
+    .default(true),
+  env: z
+    .boolean({
+      invalid_type_error: "checks.env must be a boolean",
+    })
+    .default(true),
+  build: z
+    .boolean({
+      invalid_type_error: "checks.build must be a boolean",
+    })
+    .default(true),
+  test: z
+    .boolean({
+      invalid_type_error: "checks.test must be a boolean",
+    })
+    .default(true),
+  server: z
+    .boolean({
+      invalid_type_error: "checks.server must be a boolean",
+    })
+    .default(true),
   health: HealthCheckConfigSchema.default({}),
-  readme: z.boolean({
-    invalid_type_error: "checks.readme must be a boolean"
-  }).default(true),
-  examples: z.boolean({
-    invalid_type_error: "checks.examples must be a boolean"
-  }).default(false),
-  docs: z.boolean({
-    invalid_type_error: "checks.docs must be a boolean"
-  }).default(false)
+  readme: z
+    .boolean({
+      invalid_type_error: "checks.readme must be a boolean",
+    })
+    .default(true),
+  examples: z
+    .boolean({
+      invalid_type_error: "checks.examples must be a boolean",
+    })
+    .default(false),
+  docs: z
+    .boolean({
+      invalid_type_error: "checks.docs must be a boolean",
+    })
+    .default(false),
 });
 
 export const ScoringWeightsSchema = z.object({
@@ -220,21 +250,29 @@ export const ScoringWeightsSchema = z.object({
   env: z.number().nonnegative().default(20),
   build: z.number().nonnegative().default(20),
   server: z.number().nonnegative().default(20),
-  readme: z.number().nonnegative().default(20)
+  readme: z.number().nonnegative().default(20),
 });
 
 export const FreshstartConfigSchema = z.object({
   checks: ChecksConfigSchema.default({}),
-  scoring: z.object({
-    weights: ScoringWeightsSchema.default({})
-  }).default({}),
-  failBelow: z.number({
-    invalid_type_error: "fail-below must be a number"
-  }).min(0).max(100).default(80),
-  ignore: z.array(z.string(), {
-    invalid_type_error: "ignore must be a list of strings"
-  }).default([]),
-  packageManager: PackageManagerSchema.default("auto")
+  scoring: z
+    .object({
+      weights: ScoringWeightsSchema.default({}),
+    })
+    .default({}),
+  failBelow: z
+    .number({
+      invalid_type_error: "fail-below must be a number",
+    })
+    .min(0)
+    .max(100)
+    .default(80),
+  ignore: z
+    .array(z.string(), {
+      invalid_type_error: "ignore must be a list of strings",
+    })
+    .default([]),
+  packageManager: PackageManagerSchema.default("auto"),
 });
 ```
 

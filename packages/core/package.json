@@ -1,0 +1,28 @@
+{
+  "name": "@freshstart-ci/core",
+  "version": "0.1.0",
+  "description": "Core checks, scoring, config, and reporters for FreshstartCI.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run --passWithNoTests"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "execa": "^9.3.0",
+    "js-yaml": "^4.1.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.0",
+    "ts-morph": "^23.0.0",
+    "undici": "^6.19.0",
+    "zod": "^3.23.8"
+  }
+}

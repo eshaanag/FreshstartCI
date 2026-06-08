@@ -17,14 +17,14 @@ The Quickstart Health Score is the first visual object in every final report.
 
 Terminal colors use `chalk` semantic roles:
 
-| Color | Meaning |
-| --- | --- |
-| green | passed checks, healthy score |
-| yellow | warning, partial pass, degraded score |
-| red | failed checks, broken onboarding |
-| cyan | info, running checks, neutral metadata |
-| white | standard text |
-| gray | secondary details |
+| Color  | Meaning                                |
+| ------ | -------------------------------------- |
+| green  | passed checks, healthy score           |
+| yellow | warning, partial pass, degraded score  |
+| red    | failed checks, broken onboarding       |
+| cyan   | info, running checks, neutral metadata |
+| white  | standard text                          |
+| gray   | secondary details                      |
 
 No arbitrary palette is used. Color never carries meaning alone; each status also has text and symbols.
 
@@ -99,14 +99,16 @@ Example:
 
 ```markdown
 <!-- freshstart-ci-report -->
+
 ## Quickstart Health Score: 87/100 (B)
 
-| Check | Status | Score | Summary |
-| --- | --- | ---: | --- |
-| Dependencies | PASS | 20/20 | Install completed cleanly |
-| README | WARN | 13/20 | 1 command drifted |
+| Check        | Status | Score | Summary                   |
+| ------------ | ------ | ----: | ------------------------- |
+| Dependencies | PASS   | 20/20 | Install completed cleanly |
+| README       | WARN   | 13/20 | 1 command drifted         |
 
 ### Issues
+
 - `README.md`: `npm run dev` does not exist. Use `npm start`.
 ```
 

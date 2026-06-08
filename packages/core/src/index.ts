@@ -1,0 +1,17 @@
+const CORE_VERSION = "0.1.0";
+
+/**
+ * Returns the current FreshstartCI core package version.
+ *
+ * @returns The semantic version string bundled with the core package.
+ *
+ * @example
+ * ```ts
+ * import { getCoreVersion } from "@freshstart-ci/core";
+ *
+ * getCoreVersion();
+ * ```
+ */
+export function getCoreVersion(): string {
+  return CORE_VERSION;
+}

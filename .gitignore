@@ -9,6 +9,7 @@ CHECKPOINT.md
 
 # Dependencies + build output
 node_modules/
+.pnpm-store/
 dist/
 .next/
 

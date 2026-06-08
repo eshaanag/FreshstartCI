@@ -1,0 +1,14 @@
+{
+  "name": "@freshstart-ci/github-action",
+  "version": "0.1.0",
+  "description": "GitHub Action wrapper for FreshstartCI.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsup entrypoint.ts --format esm --dts --sourcemap --clean --target node20",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@freshstart-ci/core": "workspace:*"
+  }
+}

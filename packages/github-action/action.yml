@@ -1,0 +1,28 @@
+name: "FreshstartCI"
+description: "Test whether your repo works for someone cloning it for the first time"
+inputs:
+  github-token:
+    description: "GitHub token for posting PR comments"
+    required: true
+  path:
+    description: "Path to the repo"
+    default: "."
+  post-comment:
+    description: "Post score card as PR comment"
+    default: "true"
+  fail-below:
+    description: "Fail if score is below this value"
+    default: "80"
+  checks:
+    description: "Comma-separated checks to run"
+    default: "all"
+outputs:
+  score:
+    description: "Quickstart Health Score (0-100)"
+  grade:
+    description: "Grade (A/B/C/D/F)"
+  report-json:
+    description: "Full report as JSON string"
+runs:
+  using: "docker"
+  image: "Dockerfile"

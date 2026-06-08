@@ -1,0 +1,39 @@
+{
+  "name": "freshstart-ci",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Test whether a repository works for someone cloning it for the first time.",
+  "type": "module",
+  "packageManager": "pnpm@11.5.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint . --ext .ts --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [
+    "ci",
+    "dx",
+    "developer-experience",
+    "onboarding",
+    "readme",
+    "github-actions",
+    "devtools",
+    "healthcheck"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.0",
+    "tsup": "^8.2.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

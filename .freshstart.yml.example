@@ -1,0 +1,26 @@
+checks:
+  dependencies: true
+  env: true
+  build: true
+  test: true
+  server: true
+  health:
+    enabled: true
+    port: 3000
+    path: /health
+    timeout: 10000
+  readme: true
+  examples: false
+  docs: false
+
+scoring:
+  weights:
+    dependencies: 20
+    env: 20
+    build: 20
+    server: 20
+    readme: 20
+
+fail-below: 80
+ignore: []
+package-manager: auto

@@ -1,0 +1,32 @@
+{
+  "name": "freshstart-ci",
+  "version": "0.1.0",
+  "description": "CLI for testing whether a repo works on a clean clone.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "freshstart": "./dist/bin/freshstart.js",
+    "freshstart-ci": "./dist/bin/freshstart.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run --passWithNoTests"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "@freshstart-ci/core": "workspace:*",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "ora": "^8.0.1"
+  }
+}

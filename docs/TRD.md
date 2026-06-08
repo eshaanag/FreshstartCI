@@ -109,13 +109,13 @@ Compares installed dependency versions to package metadata when network access i
 
 Default weights total 100:
 
-| Check | Points |
-| --- | ---: |
-| dependencies | 20 |
-| env | 20 |
-| build | 20 |
-| server | 20 |
-| readme | 20 |
+| Check        | Points |
+| ------------ | -----: |
+| dependencies |     20 |
+| env          |     20 |
+| build        |     20 |
+| server       |     20 |
+| readme       |     20 |
 
 Skipped non-applicable checks receive full configured weight when the absence is legitimate, such as no build script in a simple package. Disabled checks are removed from the denominator and the final score is normalized to 100.
 

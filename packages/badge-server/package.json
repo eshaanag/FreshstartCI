@@ -1,0 +1,22 @@
+{
+  "name": "@freshstart-ci/badge-server",
+  "version": "0.1.0",
+  "description": "Optional badge and report server for FreshstartCI.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run --passWithNoTests"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "hono": "^4.5.0"
+  }
+}
