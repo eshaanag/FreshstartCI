@@ -74,15 +74,36 @@ export class Runner {
     }
 
     // 5. Server Check
+    let serverResult: CheckResult | undefined;
     if (config.checks.server && shouldRun("server")) {
-      const res = await runServerCheck(context);
-      if (res) results.push(res);
+      serverResult = await runServerCheck(context);
+      if (serverResult) results.push(serverResult);
     }
 
     // 6. Health Check
     if (config.checks.health.enabled && shouldRun("health")) {
-      const res = await runHealthCheck(context);
-      if (res) results.push(res);
+      if (serverResult && serverResult.status === "skip") {
+        results.push({
+          checkId: "health",
+          name: "Health check",
+          passed: true,
+          score: config.scoring.weights.server,
+          maxScore: config.scoring.weights.server,
+          status: "skip",
+          summary: "Server check skipped; health check skipped.",
+          details: [
+            {
+              type: "info",
+              message: "No server start command detected; skipping endpoint health check.",
+              suggestion: "Add a start script if this project serves HTTP requests.",
+            },
+          ],
+          durationMs: 0,
+        });
+      } else {
+        const res = await runHealthCheck(context);
+        if (res) results.push(res);
+      }
     }
 
     // Apply fixes if requested
