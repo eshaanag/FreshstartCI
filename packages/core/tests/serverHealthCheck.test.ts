@@ -42,6 +42,28 @@ describe("runServerCheck", () => {
     expect(result.summary).toContain("exited");
     expect(result.details[0]?.message).toContain("EADDRINUSE");
   });
+
+  it("forces SIGKILL when a spawned process ignores SIGTERM", async () => {
+    const start = Date.now();
+    const result = await runServerCheck(
+      {
+        ...context(),
+        detectedFramework: {
+          ...context().detectedFramework,
+          startCommand: 'node -e "process.on(\'SIGTERM\', () => {}); setInterval(() => {}, 1000);"',
+        },
+      },
+      {
+        timeoutMs: 1000,
+        waitForServer: async () => false,
+      },
+    );
+
+    const elapsed = Date.now() - start;
+    expect(result.status).toBe("fail");
+    // Should complete after server timeout (1000ms) + grace period (~3000ms max) without hanging
+    expect(elapsed).toBeLessThan(6000);
+  });
 });
 
 describe("runHealthCheck", () => {

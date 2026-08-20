@@ -1,5 +1,8 @@
 name: "FreshstartCI"
 description: "Test whether your repo works for someone cloning it for the first time"
+branding:
+  icon: "check-circle"
+  color: "green"
 inputs:
   github-token:
     description: "GitHub token for posting PR comments"

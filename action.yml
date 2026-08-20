@@ -1,0 +1,45 @@
+name: "FreshstartCI"
+description: "Test whether a repository works for a first-time clone"
+branding:
+  icon: "check-circle"
+  color: "green"
+inputs:
+  github-token:
+    description: "GitHub token for posting PR comments"
+    required: false
+  path:
+    description: "Path to the repo"
+    default: "."
+  post-comment:
+    description: "Post score card as PR comment"
+    default: "true"
+  fail-below:
+    description: "Fail if score is below this value"
+    default: "80"
+  checks:
+    description: "Comma-separated checks to run"
+    default: "all"
+outputs:
+  score:
+    description: "Quickstart Health Score (0-100)"
+    value: ${{ steps.run-freshstart.outputs.score }}
+  grade:
+    description: "Grade (A/B/C/D/F)"
+    value: ${{ steps.run-freshstart.outputs.grade }}
+  report-json:
+    description: "Full report as JSON string"
+    value: ${{ steps.run-freshstart.outputs.report-json }}
+runs:
+  using: "composite"
+  steps:
+    - name: Run FreshstartCI
+      id: run-freshstart
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_FAIL-BELOW: ${{ inputs.fail-below }}
+        INPUT_CHECKS: ${{ inputs.checks }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_ACTIONS: "true"
+      run: |
+        node "${{ github.action_path }}/packages/github-action/dist/entrypoint.js"

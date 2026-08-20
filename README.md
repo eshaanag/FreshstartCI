@@ -1,82 +1,125 @@
 # FreshstartCI
 
-FreshstartCI tests whether a repository works for someone cloning it for the first time.
+FreshstartCI tests whether a repository successfully builds and runs for a developer cloning it for the first time.
 
-Existing CI usually starts after a project is already configured. FreshstartCI checks the setup path itself: dependency install, `.env.example`, README commands, build, server startup, and health response. The output is a Quickstart Health Score from 0 to 100 that can be shown in a README badge.
+Most CI configurations verify code after a project is already configured. FreshstartCI verifies the setup path itself: dependency installation, `.env.example` completeness, README command validity, build execution, server startup, and health response. It produces a Quickstart Health Score (0–100) and grade (A–F). Typical runs complete in under 5 seconds locally.
 
 ```text
-╔══════════════════════════════════════════════════╗
-║         QUICKSTART HEALTH SCORE: 94/100          ║
-║                    Grade: A                      ║
-╠══════════════════════════════════════════════════╣
-║  PASS  Dependencies install cleanly      20/20   ║
-║  PASS  .env.example is complete          20/20   ║
-║  PASS  Build passes                      20/20   ║
-║  PASS  Server starts and responds        20/20   ║
-║  WARN  README commands are current       14/20   ║
-╚══════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════╗
+║        QUICKSTART HEALTH SCORE: 67/100         ║
+║                    Grade: C                    ║
+╠════════════════════════════════════════════════╣
+║ WARN Dependencies install cleanly. 20/20       ║
+║ FAIL 6 env vars are missing from .env.example. ║
+║ FAIL 4 README commands have drifted. 0/20      ║
+║ PASS Build passes. 20/20                       ║
+║ SKIP No start command detected; server check is║
+║ SKIP Server check skipped; health check skipped║
+╚════════════════════════════════════════════════╝
 ```
 
-## Current Status
+## Quick Start
 
-FreshstartCI is fully built and ready to use!
-
-| Area                           | Status      |
-| ------------------------------ | ----------- |
-| Product and technical docs     | ✅ Complete |
-| pnpm workspace tooling         | ✅ Complete |
-| Core type system               | ✅ Complete |
-| Project detector               | ✅ Complete |
-| Dependency install check       | ✅ Complete |
-| Env completeness check         | ✅ Complete |
-| README command validity        | ✅ Complete |
-| Build pass check               | ✅ Complete |
-| Server start and health checks | ✅ Complete |
-| Scoring engine                 | ✅ Complete |
-| CLI commands                   | ✅ Complete |
-| GitHub Action                  | ✅ Complete |
-| Badge server                   | ✅ Complete |
-
-## Usage
-
-You can run FreshstartCI locally using `npx`:
+Run FreshstartCI locally using `npx`:
 
 ```bash
+# Run all checks on the current directory
 npx freshstart-ci run
+
+# Run specific checks
 npx freshstart-ci run --only env,build,server
+
+# Automatically apply fixes (e.g. append missing env vars to .env.example)
 npx freshstart-ci run --fix
+
+# Print Quickstart Health Score only
 npx freshstart-ci score
 ```
 
-## GitHub Actions
+## GitHub Actions Integration
+
+Add `.github/workflows/quickstart.yml` to your repository:
 
 ```yaml
-- uses: freshstart-ci/action@v1
-  with:
-    github-token: ${{ secrets.GITHUB_TOKEN }}
-    post-comment: true
-    fail-below: 80
+name: Quickstart Health Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  freshstart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: eshaanag/FreshstartCI@v1
+        with:
+          fail-below: 80
 ```
+
+### Action Inputs
+
+| Input | Description | Default | Required |
+| :--- | :--- | :--- | :--- |
+| `path` | Path to the repository root | `.` | No |
+| `fail-below` | Fail workflow step if total score is below threshold | `80` | No |
+| `checks` | Comma-separated list of check IDs to run (`all`, `env`, `build`, etc.) | `all` | No |
+| `github-token` | GitHub token for commenting on PRs | `${{ github.token }}` | No |
+
+### Action Outputs
+
+| Output | Description |
+| :--- | :--- |
+| `score` | Quickstart Health Score integer (0–100) |
+| `grade` | Health grade (`A`, `B`, `C`, `D`, `F`) |
+| `report-json` | Complete report object formatted as JSON |
 
 ## Configuration
 
-Copy `.freshstart.yml.example` to `.freshstart.yml` and adjust checks, weights, ignore paths, package manager, and health settings.
+Create `.freshstart.yml` in your repository root to customize thresholds and enabled checks:
+
+```yaml
+checks:
+  dependencies: true
+  env: true
+  build: true
+  server: true
+  health:
+    enabled: true
+    port: 3000
+    path: "/health"
+    timeout: 10000
+  readme: true
+
+scoring:
+  weights:
+    dependencies: 20
+    env: 20
+    build: 20
+    server: 20
+    readme: 20
+
+failBelow: 80
+packageManager: "auto"
+```
 
 ## Architecture
 
-The repository is a pnpm workspace:
+FreshstartCI is structured as a pnpm monorepo:
 
-- `packages/core`: checks, scoring, runner, reporters, config, and shared types.
-- `packages/cli`: `freshstart` command entrypoint.
-- `packages/github-action`: Docker-based action wrapper.
-- `packages/badge-server`: optional Hono badge and report service.
+- `packages/core`: Core checks, AST scanners, scoring engine, and terminal/markdown/JSON reporters.
+- `packages/cli`: Command-line interface (`freshstart-ci`).
+- `packages/github-action`: Entrypoint and Docker execution context for GitHub Actions.
+- `packages/badge-server`: Standalone Hono server for SVG badges and HTML report views.
 
-Core checks are designed to run offline. No API keys are required for local scoring, and source code does not leave the machine.
+All checks execute offline locally. No source code or environment variables are transmitted to external servers.
 
 ## Documentation
 
 - [PRD](docs/PRD.md)
 - [TRD](docs/TRD.md)
-- [Design](docs/DESIGN.md)
-- [Flow](docs/FLOW.md)
-- [Schema](docs/SCHEMA.md)
+- [Design Architecture](docs/DESIGN.md)
+- [Execution Flow](docs/FLOW.md)
+- [Configuration Schema](docs/SCHEMA.md)

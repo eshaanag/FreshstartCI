@@ -15,9 +15,9 @@ export async function executeFixCommand(targetPath = "."): Promise<void> {
     process.stdout.write("\nApplied Fixes:\n");
     for (const fix of result.fixesApplied) {
       if (fix.applied) {
-        process.stdout.write(`  ✅ ${fix.description}\n`);
+        process.stdout.write(`  [FIXED] ${fix.description}\n`);
       } else {
-        process.stdout.write(`  ❌ ${fix.description}: ${fix.error ?? "Failed"}\n`);
+        process.stdout.write(`  [FAILED] ${fix.description}: ${fix.error ?? "Failed"}\n`);
       }
     }
   } else {

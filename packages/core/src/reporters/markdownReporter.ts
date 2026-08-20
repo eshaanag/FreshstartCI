@@ -18,14 +18,14 @@ export function renderMarkdownReport(score: QuickstartHealthScore): string {
   for (const check of score.checks) {
     const icon =
       check.status === "pass"
-        ? "✅"
+        ? "PASS"
         : check.status === "warn"
-          ? "⚠️"
+          ? "WARN"
           : check.status === "skip"
-            ? "⏭️"
-            : "❌";
+            ? "SKIP"
+            : "FAIL";
     lines.push(
-      `| ${icon} ${check.status.toUpperCase()} | ${check.name} | ${check.score}/${check.maxScore} | ${check.summary} |`,
+      `| ${icon} | ${check.name} | ${check.score}/${check.maxScore} | ${check.summary} |`,
     );
   }
 
@@ -45,7 +45,7 @@ export function renderMarkdownReport(score: QuickstartHealthScore): string {
         }
       }
       if (check.fix) {
-        lines.push(`- 🛠️ **Auto-Fix Available:** ${check.fix.description}`);
+        lines.push(`- **Fix Available:** ${check.fix.description}`);
       }
     }
   }

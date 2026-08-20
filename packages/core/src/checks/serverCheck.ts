@@ -185,8 +185,8 @@ async function waitForPort(
   return false;
 }
 
-function killProcessGroup(child: ChildProcess): void {
-  if (child.pid === undefined) {
+async function killProcessGroup(child: ChildProcess, gracePeriodMs = 3000): Promise<void> {
+  if (child.pid === undefined || child.exitCode !== null) {
     return;
   }
 
@@ -194,6 +194,21 @@ function killProcessGroup(child: ChildProcess): void {
     process.kill(-child.pid, "SIGTERM");
   } catch {
     child.kill("SIGTERM");
+  }
+
+  const deadline = Date.now() + gracePeriodMs;
+  while (Date.now() < deadline) {
+    if (child.exitCode !== null) {
+      return;
+    }
+    await sleep(100);
+  }
+
+  // Grace period expired; force kill process group with SIGKILL
+  try {
+    process.kill(-child.pid, "SIGKILL");
+  } catch {
+    child.kill("SIGKILL");
   }
 }
 
