@@ -19,7 +19,7 @@ Existing CI usually starts after a project is already configured. FreshstartCI c
 
 ## Current Status
 
-FreshstartCI is under active implementation. The product docs and workspace scaffold are complete; check implementations come next.
+FreshstartCI is fully built and ready to use!
 
 | Area                           | Status      |
 | ------------------------------ | ----------- |
@@ -33,11 +33,13 @@ FreshstartCI is under active implementation. The product docs and workspace scaf
 | Build pass check               | ✅ Complete |
 | Server start and health checks | ✅ Complete |
 | Scoring engine                 | ✅ Complete |
-| CLI commands                   | 📋 Planned  |
-| GitHub Action                  | 📋 Planned  |
-| Badge server                   | 📋 Planned  |
+| CLI commands                   | ✅ Complete |
+| GitHub Action                  | ✅ Complete |
+| Badge server                   | ✅ Complete |
 
-## Planned Usage
+## Usage
+
+You can run FreshstartCI locally using `npx`:
 
 ```bash
 npx freshstart-ci run
