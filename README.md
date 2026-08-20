@@ -118,8 +118,6 @@ All checks execute offline locally. No source code or environment variables are 
 
 ## Documentation
 
-- [PRD](docs/PRD.md)
-- [TRD](docs/TRD.md)
 - [Design Architecture](docs/DESIGN.md)
 - [Execution Flow](docs/FLOW.md)
 - [Configuration Schema](docs/SCHEMA.md)

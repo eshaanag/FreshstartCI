@@ -6,6 +6,8 @@
 # Private build docs
 PROGRESS.md
 CHECKPOINT.md
+docs/PRD.md
+docs/TRD.md
 
 # Dependencies + build output
 node_modules/

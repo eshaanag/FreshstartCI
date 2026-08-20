@@ -5,7 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "tsup entrypoint.ts --format esm --dts --sourcemap --clean --target node20",
+    "build": "tsup",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
