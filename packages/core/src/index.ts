@@ -1,6 +1,9 @@
 const CORE_VERSION = "0.1.0";
 
 export * from "./types/index.js";
+export * from "./config/index.js";
+export * from "./reporters/index.js";
+export * from "./runner/Runner.js";
 export * from "./lib/detector.js";
 export * from "./lib/astScanner.js";
 export * from "./checks/dependencyCheck.js";
