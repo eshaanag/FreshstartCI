@@ -42,4 +42,4 @@ runs:
         INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_ACTIONS: "true"
       run: |
-        node "${{ github.action_path }}/packages/github-action/dist/entrypoint.js"
+        node "${{ github.action_path }}/packages/github-action/dist/entrypoint.cjs"
