@@ -1,6 +1,6 @@
 import { execa } from "execa";
 
-import type { CheckContext, CheckDetail, CheckResult } from "../types/index.js";
+import type { CheckContext, CheckDetail, CheckResult, DetectedFramework } from "../types/index.js";
 
 export interface BuildCommand {
   command: string;
@@ -42,11 +42,13 @@ export async function runBuildCheck(
 ): Promise<CheckResult> {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.build;
-  const framework = (context.detectedFramework as any)?.detectedFramework || context.detectedFramework;
-  const buildCommand = framework?.buildCommand?.trim() ?? "";
+  const rawFramework = context.detectedFramework as
+    (DetectedFramework & { detectedFramework?: DetectedFramework }) | undefined;
+  const framework = rawFramework?.detectedFramework || rawFramework;
+  const buildCommand = framework?.buildCommand?.trim();
 
   try {
-    if (buildCommand.length === 0) {
+    if (!buildCommand || buildCommand.length === 0) {
       return result({
         score: maxScore,
         maxScore,

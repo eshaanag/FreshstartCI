@@ -31,6 +31,21 @@ describe("runDependencyCheck", () => {
     expect(result.score).toBe(20);
   });
 
+  it("passes in monorepo when node_modules is created in a subdirectory", async () => {
+    const repoPath = await createRepo();
+    const result = await runDependencyCheck(
+      context(repoPath),
+      optionsForCommand(async (command) => {
+        await mkdir(path.join(command.cwd, "packages", "app", "node_modules"), { recursive: true });
+
+        return { exitCode: 0, stdout: "", stderr: "", timedOut: false };
+      }),
+    );
+
+    expect(result.status).toBe("pass");
+    expect(result.score).toBe(20);
+  });
+
   it("warns when install reports peer dependency warnings", async () => {
     const repoPath = await createRepo();
     const result = await runDependencyCheck(

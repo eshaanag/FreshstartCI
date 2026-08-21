@@ -150,7 +150,10 @@ export async function runReadmeCheck(context: CheckContext): Promise<CheckResult
  * ```
  */
 export function extractReadmeCommands(markdown: string): ReadmeCommand[] {
-  const gfmPlugin = typeof remarkGfm === "function" ? remarkGfm : (remarkGfm as { default?: any }).default ?? remarkGfm;
+  const gfmPlugin =
+    typeof remarkGfm === "function"
+      ? remarkGfm
+      : (((remarkGfm as { default?: unknown }).default as typeof remarkGfm) ?? remarkGfm);
   const tree = remark().use(gfmPlugin).parse(markdown) as MarkdownNode;
   const codeBlocks: MarkdownNode[] = [];
   collectCodeBlocks(tree, codeBlocks);

@@ -5,15 +5,7 @@
 ```typescript
 export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
 export type CheckId =
-  | "dependencies"
-  | "env"
-  | "build"
-  | "test"
-  | "server"
-  | "health"
-  | "readme"
-  | "examples"
-  | "docs";
+  "dependencies" | "env" | "build" | "test" | "server" | "health" | "readme" | "examples" | "docs";
 export type Grade = "A" | "B" | "C" | "D" | "F";
 export type CheckStatus = "pass" | "warn" | "fail" | "skip";
 export type DetailType = "error" | "warning" | "info";

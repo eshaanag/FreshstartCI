@@ -38,4 +38,32 @@ describe("GitHub Action", () => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it("appends summary on push events (non-pull_request)", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "freshstart-action-push-test-"));
+    const summaryFile = path.join(tmpDir, "summary.md");
+
+    fs.writeFileSync(path.join(tmpDir, "package.json"), JSON.stringify({ name: "push-test" }));
+    fs.writeFileSync(summaryFile, "");
+
+    const origSummary = process.env.GITHUB_STEP_SUMMARY;
+    const origEvent = process.env.GITHUB_EVENT_NAME;
+    const origPath = process.env.INPUT_PATH;
+
+    process.env.GITHUB_STEP_SUMMARY = summaryFile;
+    process.env.GITHUB_EVENT_NAME = "push";
+    process.env.INPUT_PATH = tmpDir;
+
+    try {
+      await runAction();
+
+      const summaryContent = fs.readFileSync(summaryFile, "utf8");
+      expect(summaryContent).toContain("FreshstartCI Report:");
+    } finally {
+      process.env.GITHUB_STEP_SUMMARY = origSummary;
+      process.env.GITHUB_EVENT_NAME = origEvent;
+      process.env.INPUT_PATH = origPath;
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });

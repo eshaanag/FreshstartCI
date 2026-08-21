@@ -50,7 +50,7 @@ describe("runServerCheck", () => {
         ...context(),
         detectedFramework: {
           ...context().detectedFramework,
-          startCommand: 'node -e "process.on(\'SIGTERM\', () => {}); setInterval(() => {}, 1000);"',
+          startCommand: "node -e \"process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);\"",
         },
       },
       {
@@ -94,6 +94,32 @@ describe("runHealthCheck", () => {
 
     expect(result.status).toBe("fail");
     expect(result.score).toBe(0);
+  });
+
+  it("handles nested detectedFramework properly in runHealthCheck", async () => {
+    const customContext = {
+      ...context(),
+      detectedFramework: {
+        detectedFramework: {
+          name: "express",
+          startCommand: "node server.js",
+          buildCommand: "",
+          port: 4000,
+          healthPath: "/custom-health",
+        },
+      },
+    } as unknown as CheckContext;
+
+    let requestedUrl = "";
+    const result = await runHealthCheck(customContext, {
+      requestHealth: async (url) => {
+        requestedUrl = url;
+        return { statusCode: 200, body: "ok" };
+      },
+    });
+
+    expect(result.status).toBe("pass");
+    expect(requestedUrl).toBe("http://localhost:4000/custom-health");
   });
 });
 

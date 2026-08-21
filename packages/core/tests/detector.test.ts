@@ -129,6 +129,19 @@ describe("detectProject", () => {
     expect(detection.detectedFramework.name).toBe("unknown");
     expect(detection.warnings[0]?.message).toContain("No package.json found");
   });
+
+  it("falls back to npm when package.json exists but no lockfile is found", async () => {
+    const repoPath = await createRepo({
+      packageJson: {
+        name: "no-lockfile-pkg",
+      },
+    });
+
+    const detection = await detectProject(repoPath);
+
+    expect(detection.isNodeProject).toBe(true);
+    expect(detection.packageManager).toBe("npm");
+  });
 });
 
 interface RepoFixture {

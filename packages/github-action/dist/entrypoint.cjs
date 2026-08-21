@@ -282379,7 +282379,7 @@ var require_fetch = __commonJS({
     function handleFetchDone(response) {
       finalizeAndReportTiming(response, "fetch");
     }
-    function fetch(input, init = void 0) {
+    function fetch2(input, init = void 0) {
       webidl.argumentLengthCheck(arguments, 1, "globalThis.fetch");
       let p = createDeferredPromise();
       let requestObject;
@@ -283336,7 +283336,7 @@ var require_fetch = __commonJS({
       }
     }
     module2.exports = {
-      fetch,
+      fetch: fetch2,
       Fetch,
       fetching,
       finalizeAndReportTiming
@@ -287685,7 +287685,7 @@ var require_undici = __commonJS({
     module2.exports.setGlobalDispatcher = setGlobalDispatcher;
     module2.exports.getGlobalDispatcher = getGlobalDispatcher;
     var fetchImpl = require_fetch().fetch;
-    module2.exports.fetch = async function fetch(init, options = void 0) {
+    module2.exports.fetch = async function fetch2(init, options = void 0) {
       try {
         return await fetchImpl(init, options);
       } catch (err) {
@@ -287740,6 +287740,8 @@ __export(entrypoint_exports, {
   runAction: () => runAction
 });
 module.exports = __toCommonJS(entrypoint_exports);
+
+// src/entrypoint.ts
 var import_node_fs6 = __toESM(require("fs"), 1);
 var import_node_path7 = __toESM(require("path"), 1);
 
@@ -314090,9 +314092,7 @@ function renderMarkdownReport(score) {
   lines.push("| :--- | :--- | :--- | :--- |");
   for (const check of score.checks) {
     const icon = check.status === "pass" ? "PASS" : check.status === "warn" ? "WARN" : check.status === "skip" ? "SKIP" : "FAIL";
-    lines.push(
-      `| ${icon} | ${check.name} | ${check.score}/${check.maxScore} | ${check.summary} |`
-    );
+    lines.push(`| ${icon} | ${check.name} | ${check.score}/${check.maxScore} | ${check.summary} |`);
   }
   const detailsWithIssues = score.checks.filter((c3) => c3.details.length > 0 || c3.fix !== void 0);
   if (detailsWithIssues.length > 0) {
@@ -314620,8 +314620,10 @@ function firstUsefulLine(output) {
 }
 function isExcludedCopyPath(repoPath, source) {
   const relative = import_path3.default.relative(repoPath, source);
-  const firstSegment = relative.split(import_path3.default.sep)[0];
-  return firstSegment === ".git" || firstSegment === "node_modules" || firstSegment === "dist" || firstSegment === ".next";
+  const segments = relative.split(import_path3.default.sep);
+  return segments.some(
+    (segment) => segment === ".git" || segment === "node_modules" || segment === "dist" || segment === ".next"
+  );
 }
 async function fileExists2(filePath) {
   try {
@@ -314639,6 +314641,9 @@ async function hasAnyNodeModules(dirPath) {
     const entries = await (0, import_promises13.readdir)(dirPath, { withFileTypes: true });
     for (const entry of entries) {
       if (entry.isDirectory() && entry.name !== ".git" && entry.name !== "dist" && entry.name !== ".next") {
+        if (entry.name === "node_modules") {
+          return true;
+        }
         const subPath = import_path3.default.join(dirPath, entry.name);
         if (await hasAnyNodeModules(subPath)) {
           return true;
@@ -315225,10 +315230,11 @@ var DEFAULT_TIMEOUT_MS2 = 18e4;
 async function runBuildCheck(context, options = {}) {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.build;
-  const framework2 = context.detectedFramework?.detectedFramework || context.detectedFramework;
-  const buildCommand = framework2?.buildCommand?.trim() ?? "";
+  const rawFramework = context.detectedFramework;
+  const framework2 = rawFramework?.detectedFramework || rawFramework;
+  const buildCommand = framework2?.buildCommand?.trim();
   try {
-    if (buildCommand.length === 0) {
+    if (!buildCommand || buildCommand.length === 0) {
       return result4({
         score: maxScore,
         maxScore,
@@ -315401,10 +315407,11 @@ var DEFAULT_SERVER_TIMEOUT_MS = 3e4;
 async function runServerCheck(context, options = {}) {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.server;
-  const framework2 = context.detectedFramework?.detectedFramework || context.detectedFramework;
-  const startCommand = framework2?.startCommand?.trim() ?? "";
+  const rawFramework = context.detectedFramework;
+  const framework2 = rawFramework?.detectedFramework || rawFramework;
+  const startCommand = framework2?.startCommand?.trim();
   try {
-    if (startCommand.length === 0) {
+    if (!startCommand || startCommand.length === 0) {
       return result5({
         score: maxScore,
         maxScore,
@@ -315495,7 +315502,7 @@ async function startServerProcess(command, cwd) {
     hasExited: () => exited,
     stderrLines: () => stderrLines,
     kill: async () => {
-      killProcessGroup(child);
+      await killProcessGroup(child);
     }
   };
 }
@@ -315564,15 +315571,16 @@ function result5(input) {
 var PASSING_STATUS_CODES = /* @__PURE__ */ new Set([200, 201, 204, 301, 302]);
 async function runHealthCheck(context, options = {}) {
   const startedAt = Date.now();
-  const maxScore = context.config.scoring.weights.server;
-  const healthConfig = context.config.checks.health;
-  const framework2 = context.detectedFramework?.detectedFramework || context.detectedFramework;
-  const port = framework2?.port ?? 3e3;
+  const maxScore = context.config?.scoring?.weights?.server ?? 20;
+  const healthConfig = context.config?.checks?.health;
+  const rawFramework = context.detectedFramework;
+  const framework2 = rawFramework?.detectedFramework || rawFramework;
+  const port = framework2?.port ?? healthConfig?.port ?? 3e3;
   const healthPath = framework2?.healthPath || healthConfig?.path || "/";
   const url = `http://localhost:${port}${healthPath}`;
   try {
     const requestHealth = options.requestHealth ?? requestHealthEndpoint;
-    const response = await requestHealth(url, healthConfig.timeout);
+    const response = await requestHealth(url, healthConfig?.timeout ?? 1e4);
     if (PASSING_STATUS_CODES.has(response.statusCode)) {
       return result6({
         score: maxScore,
@@ -315752,7 +315760,7 @@ var Runner = class _Runner {
   }
 };
 
-// entrypoint.ts
+// src/entrypoint.ts
 async function runAction() {
   const targetPath = process.env.INPUT_PATH || ".";
   const repoPath = import_node_path7.default.resolve(process.cwd(), targetPath);
@@ -315787,6 +315795,28 @@ async function runAction() {
 `, "utf8");
     import_node_fs6.default.appendFileSync(outputFile, `report-json=${jsonReportStr}
 `, "utf8");
+  }
+  if ((process.env["INPUT_POST-COMMENT"] ?? process.env.INPUT_POST_COMMENT ?? "true") !== "false" && (process.env["INPUT_GITHUB-TOKEN"] ?? process.env.INPUT_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN) && process.env.GITHUB_EVENT_PATH && import_node_fs6.default.existsSync(process.env.GITHUB_EVENT_PATH)) {
+    try {
+      const eventData = JSON.parse(import_node_fs6.default.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
+      const prNumber = eventData.pull_request?.number ?? eventData.number;
+      const repoFullName = process.env.GITHUB_REPOSITORY;
+      const token = process.env["INPUT_GITHUB-TOKEN"] ?? process.env.INPUT_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
+      if (prNumber && repoFullName && token) {
+        const apiUrl = `https://api.github.com/repos/${repoFullName}/issues/${prNumber}/comments`;
+        await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "User-Agent": "FreshstartCI-GitHub-Action",
+            "Content-Type": "application/json",
+            Accept: "application/vnd.github+json"
+          },
+          body: JSON.stringify({ body: markdownReport })
+        });
+      }
+    } catch {
+    }
   }
   const effectiveFailBelow = failBelow ?? result7.report.config.failBelow;
   if (result7.score.total < effectiveFailBelow) {

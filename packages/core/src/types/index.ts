@@ -3,15 +3,7 @@ import { z } from "zod";
 export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
 export type PackageManagerPreference = "auto" | PackageManager;
 export type CheckId =
-  | "dependencies"
-  | "env"
-  | "build"
-  | "test"
-  | "server"
-  | "health"
-  | "readme"
-  | "examples"
-  | "docs";
+  "dependencies" | "env" | "build" | "test" | "server" | "health" | "readme" | "examples" | "docs";
 export type Grade = "A" | "B" | "C" | "D" | "F";
 export type CheckStatus = "pass" | "warn" | "fail" | "skip";
 export type DetailType = "error" | "warning" | "info";
@@ -364,13 +356,12 @@ export const FreshstartConfigFileSchema = z
     packageManager: PackageManagerPreferenceSchema.optional(),
   })
   .strict()
-  .transform(
-    (input): FreshstartConfig =>
-      FreshstartConfigSchema.parse({
-        checks: input.checks,
-        scoring: input.scoring,
-        failBelow: input["fail-below"] ?? input.failBelow,
-        ignore: input.ignore,
-        packageManager: input["package-manager"] ?? input.packageManager,
-      }),
+  .transform((input): FreshstartConfig =>
+    FreshstartConfigSchema.parse({
+      checks: input.checks,
+      scoring: input.scoring,
+      failBelow: input["fail-below"] ?? input.failBelow,
+      ignore: input.ignore,
+      packageManager: input["package-manager"] ?? input.packageManager,
+    }),
   );

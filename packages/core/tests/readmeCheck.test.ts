@@ -88,6 +88,22 @@ describe("runReadmeCheck", () => {
     expect(result.score).toBe(0);
     expect(result.details).toHaveLength(3);
   });
+
+  it("never suggests 'undefined install' when packageManager is undefined", async () => {
+    const repoPath = await createRepo({
+      "package.json": JSON.stringify({ scripts: {} }),
+      "README.md": "```bash\nnpm install\n```",
+    });
+
+    const result = await runReadmeCheck(
+      context(repoPath, undefined as unknown as CheckContext["packageManager"]),
+    );
+
+    expect(result.status).toBe("pass");
+    for (const detail of result.details) {
+      expect(detail.suggestion).not.toContain("undefined install");
+    }
+  });
 });
 
 async function createRepo(files: Record<string, string>): Promise<string> {

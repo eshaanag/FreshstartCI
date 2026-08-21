@@ -312,13 +312,11 @@ function firstUsefulLine(output: string): string | undefined {
 
 function isExcludedCopyPath(repoPath: string, source: string): boolean {
   const relative = path.relative(repoPath, source);
-  const firstSegment = relative.split(path.sep)[0];
+  const segments = relative.split(path.sep);
 
-  return (
-    firstSegment === ".git" ||
-    firstSegment === "node_modules" ||
-    firstSegment === "dist" ||
-    firstSegment === ".next"
+  return segments.some(
+    (segment) =>
+      segment === ".git" || segment === "node_modules" || segment === "dist" || segment === ".next",
   );
 }
 
@@ -345,6 +343,9 @@ async function hasAnyNodeModules(dirPath: string): Promise<boolean> {
         entry.name !== "dist" &&
         entry.name !== ".next"
       ) {
+        if (entry.name === "node_modules") {
+          return true;
+        }
         const subPath = path.join(dirPath, entry.name);
         if (await hasAnyNodeModules(subPath)) {
           return true;

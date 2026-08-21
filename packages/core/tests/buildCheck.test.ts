@@ -60,6 +60,28 @@ describe("runBuildCheck", () => {
     expect(result.status).toBe("fail");
     expect(result.summary).toBe("Build timed out.");
   });
+
+  it("handles nested detectedFramework and undefined buildCommand safely", async () => {
+    const customContext = {
+      repoPath: process.cwd(),
+      config: DEFAULT_CONFIG,
+      packageManager: "npm",
+      detectedFramework: {
+        detectedFramework: {
+          name: "vite",
+          buildCommand: undefined,
+          startCommand: "vite preview",
+          port: 5173,
+          healthPath: "/",
+        },
+      },
+      env: {},
+    } as unknown as CheckContext;
+
+    const result = await runBuildCheck(customContext);
+    expect(result.status).toBe("skip");
+    expect(result.score).toBe(20);
+  });
 });
 
 function options(runCommand: NonNullable<BuildCheckOptions["runCommand"]>): BuildCheckOptions {

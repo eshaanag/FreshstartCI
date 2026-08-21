@@ -42,11 +42,16 @@ export async function runServerCheck(
 ): Promise<CheckResult> {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.server;
-  const framework = (context.detectedFramework as any)?.detectedFramework || context.detectedFramework;
-  const startCommand = framework?.startCommand?.trim() ?? "";
+  const rawFramework = context.detectedFramework as
+    | (CheckContext["detectedFramework"] & {
+        detectedFramework?: CheckContext["detectedFramework"];
+      })
+    | undefined;
+  const framework = rawFramework?.detectedFramework || rawFramework;
+  const startCommand = framework?.startCommand?.trim();
 
   try {
-    if (startCommand.length === 0) {
+    if (!startCommand || startCommand.length === 0) {
       return result({
         score: maxScore,
         maxScore,
@@ -154,7 +159,7 @@ async function startServerProcess(command: string, cwd: string): Promise<ServerP
     hasExited: () => exited,
     stderrLines: () => stderrLines,
     kill: async (): Promise<void> => {
-      killProcessGroup(child);
+      await killProcessGroup(child);
     },
   };
 }

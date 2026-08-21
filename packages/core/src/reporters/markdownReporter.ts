@@ -24,9 +24,7 @@ export function renderMarkdownReport(score: QuickstartHealthScore): string {
           : check.status === "skip"
             ? "SKIP"
             : "FAIL";
-    lines.push(
-      `| ${icon} | ${check.name} | ${check.score}/${check.maxScore} | ${check.summary} |`,
-    );
+    lines.push(`| ${icon} | ${check.name} | ${check.score}/${check.maxScore} | ${check.summary} |`);
   }
 
   const detailsWithIssues = score.checks.filter((c) => c.details.length > 0 || c.fix !== undefined);

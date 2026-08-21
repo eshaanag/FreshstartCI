@@ -31,16 +31,21 @@ export async function runHealthCheck(
   options: HealthCheckOptions = {},
 ): Promise<CheckResult> {
   const startedAt = Date.now();
-  const maxScore = context.config.scoring.weights.server;
-  const healthConfig = context.config.checks.health;
-  const framework = (context.detectedFramework as any)?.detectedFramework || context.detectedFramework;
-  const port = framework?.port ?? 3000;
+  const maxScore = context.config?.scoring?.weights?.server ?? 20;
+  const healthConfig = context.config?.checks?.health;
+  const rawFramework = context.detectedFramework as
+    | (CheckContext["detectedFramework"] & {
+        detectedFramework?: CheckContext["detectedFramework"];
+      })
+    | undefined;
+  const framework = rawFramework?.detectedFramework || rawFramework;
+  const port = framework?.port ?? healthConfig?.port ?? 3000;
   const healthPath = framework?.healthPath || healthConfig?.path || "/";
   const url = `http://localhost:${port}${healthPath}`;
 
   try {
     const requestHealth = options.requestHealth ?? requestHealthEndpoint;
-    const response = await requestHealth(url, healthConfig.timeout);
+    const response = await requestHealth(url, healthConfig?.timeout ?? 10000);
 
     if (PASSING_STATUS_CODES.has(response.statusCode)) {
       return result({
