@@ -211688,7 +211688,7 @@ var require_async2 = __commonJS({
         readdirWithFileTypes(directory, settings, callback);
         return;
       }
-      readdir3(directory, settings, callback);
+      readdir4(directory, settings, callback);
     }
     exports2.read = read;
     function readdirWithFileTypes(directory, settings, callback) {
@@ -211737,7 +211737,7 @@ var require_async2 = __commonJS({
         });
       };
     }
-    function readdir3(directory, settings, callback) {
+    function readdir4(directory, settings, callback) {
       settings.fs.readdir(directory, (readdirError, names) => {
         if (readdirError !== null) {
           callFailureCallback(callback, readdirError);
@@ -211772,7 +211772,7 @@ var require_async2 = __commonJS({
         });
       });
     }
-    exports2.readdir = readdir3;
+    exports2.readdir = readdir4;
     function callFailureCallback(callback, error) {
       callback(error);
     }
@@ -211796,7 +211796,7 @@ var require_sync2 = __commonJS({
       if (!settings.stats && constants_1.IS_SUPPORT_READDIR_WITH_FILE_TYPES) {
         return readdirWithFileTypes(directory, settings);
       }
-      return readdir3(directory, settings);
+      return readdir4(directory, settings);
     }
     exports2.read = read;
     function readdirWithFileTypes(directory, settings) {
@@ -211821,7 +211821,7 @@ var require_sync2 = __commonJS({
       });
     }
     exports2.readdirWithFileTypes = readdirWithFileTypes;
-    function readdir3(directory, settings) {
+    function readdir4(directory, settings) {
       const names = settings.fs.readdirSync(directory);
       return names.map((name) => {
         const entryPath = common3.joinPathSegments(directory, name, settings.pathSegmentSeparator);
@@ -211837,7 +211837,7 @@ var require_sync2 = __commonJS({
         return entry;
       });
     }
-    exports2.readdir = readdir3;
+    exports2.readdir = readdir4;
   }
 });
 
@@ -314180,7 +314180,7 @@ async function detectProject(repoPath, packageManagerPreference = "auto") {
   const detectedFramework = await detectFramework(repoPath, packageJson, warnings);
   return {
     isNodeProject: true,
-    packageManager: packageManagerDetection.packageManager,
+    packageManager: packageManagerDetection.packageManager || "npm",
     detectedFramework,
     warnings: [...warnings, ...packageManagerDetection.warnings],
     packageJsonPath
@@ -314482,7 +314482,7 @@ async function runDependencyCheck(context, options = {}) {
           durationMs: Date.now() - startedAt
         });
       }
-      if (!await fileExists2(import_path3.default.join(sandbox.repoPath, "node_modules"))) {
+      if (!await hasAnyNodeModules(sandbox.repoPath)) {
         return result({
           score: 0,
           maxScore,
@@ -314545,7 +314545,7 @@ async function runDependencyCheck(context, options = {}) {
   }
 }
 async function createCleanRepositoryCopy(repoPath) {
-  const sourceHadNodeModules = await fileExists2(import_path3.default.join(repoPath, "node_modules"));
+  const sourceHadNodeModules = await hasAnyNodeModules(repoPath);
   const sandboxRoot = await (0, import_promises13.mkdtemp)(import_path3.default.join((0, import_os.tmpdir)(), "freshstart-ci-install-"));
   const sandboxRepoPath = import_path3.default.join(sandboxRoot, "repo");
   await (0, import_promises13.cp)(repoPath, sandboxRepoPath, {
@@ -314630,6 +314630,24 @@ async function fileExists2(filePath) {
   } catch {
     return false;
   }
+}
+async function hasAnyNodeModules(dirPath) {
+  if (await fileExists2(import_path3.default.join(dirPath, "node_modules"))) {
+    return true;
+  }
+  try {
+    const entries = await (0, import_promises13.readdir)(dirPath, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory() && entry.name !== ".git" && entry.name !== "dist" && entry.name !== ".next") {
+        const subPath = import_path3.default.join(dirPath, entry.name);
+        if (await hasAnyNodeModules(subPath)) {
+          return true;
+        }
+      }
+    }
+  } catch {
+  }
+  return false;
 }
 var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set([".ts", ".tsx", ".js", ".jsx"]);
 var EXCLUDED_DIRECTORIES = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".next", "coverage"]);
@@ -315060,12 +315078,13 @@ async function validateCommands(context, packageJson, commands) {
   return details;
 }
 function validatePackageManagerCommand(expected, actual, command, details) {
-  if (actual === "npm" && command.command === "npm install" && expected !== "npm") {
+  const pm = expected || "npm";
+  if (actual === "npm" && command.command === "npm install" && pm !== "npm") {
     details.push({
       type: "error",
-      message: `README uses npm install, but detected package manager is ${expected}.`,
+      message: `README uses npm install, but detected package manager is ${pm}.`,
       file: "README.md",
-      suggestion: `${expected} install`
+      suggestion: `${pm} install`
     });
   }
 }
@@ -315206,7 +315225,8 @@ var DEFAULT_TIMEOUT_MS2 = 18e4;
 async function runBuildCheck(context, options = {}) {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.build;
-  const buildCommand = context.detectedFramework.buildCommand.trim();
+  const framework2 = context.detectedFramework?.detectedFramework || context.detectedFramework;
+  const buildCommand = framework2?.buildCommand?.trim() ?? "";
   try {
     if (buildCommand.length === 0) {
       return result4({
@@ -315381,7 +315401,8 @@ var DEFAULT_SERVER_TIMEOUT_MS = 3e4;
 async function runServerCheck(context, options = {}) {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.server;
-  const startCommand = context.detectedFramework.startCommand.trim();
+  const framework2 = context.detectedFramework?.detectedFramework || context.detectedFramework;
+  const startCommand = framework2?.startCommand?.trim() ?? "";
   try {
     if (startCommand.length === 0) {
       return result5({
@@ -315404,7 +315425,7 @@ async function runServerCheck(context, options = {}) {
     const serverProcess = await startProcess(startCommand, context.repoPath);
     try {
       const opened = await waitForServer(
-        context.detectedFramework.port,
+        framework2?.port ?? 3e3,
         options.timeoutMs ?? DEFAULT_SERVER_TIMEOUT_MS,
         serverProcess
       );
@@ -315545,7 +315566,10 @@ async function runHealthCheck(context, options = {}) {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.server;
   const healthConfig = context.config.checks.health;
-  const url = `http://localhost:${context.detectedFramework.port}${context.detectedFramework.healthPath || healthConfig.path}`;
+  const framework2 = context.detectedFramework?.detectedFramework || context.detectedFramework;
+  const port = framework2?.port ?? 3e3;
+  const healthPath = framework2?.healthPath || healthConfig?.path || "/";
+  const url = `http://localhost:${port}${healthPath}`;
   try {
     const requestHealth = options.requestHealth ?? requestHealthEndpoint;
     const response = await requestHealth(url, healthConfig.timeout);
@@ -315746,6 +315770,8 @@ async function runAction() {
     runnerOptions.onlyChecks = onlyChecks;
   }
   const result7 = await Runner.runAll(runnerOptions);
+  const terminalReport = renderTerminalReport(result7.score);
+  console.log(terminalReport);
   const markdownReport = renderMarkdownReport(result7.score);
   const jsonReportStr = formatJsonReport(result7.score, result7.report.config, false);
   const stepSummaryFile = process.env.GITHUB_STEP_SUMMARY;

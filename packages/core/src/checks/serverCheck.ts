@@ -42,7 +42,8 @@ export async function runServerCheck(
 ): Promise<CheckResult> {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.server;
-  const startCommand = context.detectedFramework.startCommand.trim();
+  const framework = (context.detectedFramework as any)?.detectedFramework || context.detectedFramework;
+  const startCommand = framework?.startCommand?.trim() ?? "";
 
   try {
     if (startCommand.length === 0) {
@@ -68,7 +69,7 @@ export async function runServerCheck(
 
     try {
       const opened = await waitForServer(
-        context.detectedFramework.port,
+        framework?.port ?? 3000,
         options.timeoutMs ?? DEFAULT_SERVER_TIMEOUT_MS,
         serverProcess,
       );

@@ -1,4 +1,4 @@
-import { access, cp, mkdtemp, rm } from "node:fs/promises";
+import { access, cp, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -124,7 +124,7 @@ export async function runDependencyCheck(
         });
       }
 
-      if (!(await fileExists(path.join(sandbox.repoPath, "node_modules")))) {
+      if (!(await hasAnyNodeModules(sandbox.repoPath))) {
         return result({
           score: 0,
           maxScore,
@@ -208,7 +208,7 @@ export async function runDependencyCheck(
  * ```
  */
 export async function createCleanRepositoryCopy(repoPath: string): Promise<DependencySandbox> {
-  const sourceHadNodeModules = await fileExists(path.join(repoPath, "node_modules"));
+  const sourceHadNodeModules = await hasAnyNodeModules(repoPath);
   const sandboxRoot = await mkdtemp(path.join(tmpdir(), "freshstart-ci-install-"));
   const sandboxRepoPath = path.join(sandboxRoot, "repo");
 
@@ -329,4 +329,31 @@ async function fileExists(filePath: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+async function hasAnyNodeModules(dirPath: string): Promise<boolean> {
+  if (await fileExists(path.join(dirPath, "node_modules"))) {
+    return true;
+  }
+
+  try {
+    const entries = await readdir(dirPath, { withFileTypes: true });
+    for (const entry of entries) {
+      if (
+        entry.isDirectory() &&
+        entry.name !== ".git" &&
+        entry.name !== "dist" &&
+        entry.name !== ".next"
+      ) {
+        const subPath = path.join(dirPath, entry.name);
+        if (await hasAnyNodeModules(subPath)) {
+          return true;
+        }
+      }
+    }
+  } catch {
+    // Ignore read errors
+  }
+
+  return false;
 }

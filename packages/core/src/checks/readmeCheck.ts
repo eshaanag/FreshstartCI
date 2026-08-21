@@ -218,17 +218,18 @@ async function validateCommands(
 }
 
 function validatePackageManagerCommand(
-  expected: PackageManager,
+  expected: PackageManager | undefined,
   actual: string,
   command: ReadmeCommand,
   details: CheckDetail[],
 ): void {
-  if (actual === "npm" && command.command === "npm install" && expected !== "npm") {
+  const pm = expected || "npm";
+  if (actual === "npm" && command.command === "npm install" && pm !== "npm") {
     details.push({
       type: "error",
-      message: `README uses npm install, but detected package manager is ${expected}.`,
+      message: `README uses npm install, but detected package manager is ${pm}.`,
       file: "README.md",
-      suggestion: `${expected} install`,
+      suggestion: `${pm} install`,
     });
   }
 }

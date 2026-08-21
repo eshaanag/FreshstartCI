@@ -5,6 +5,7 @@ import {
   CheckId,
   RunnerOptions,
   renderMarkdownReport,
+  renderTerminalReport,
   formatJsonReport,
 } from "@freshstart-ci/core";
 
@@ -34,6 +35,9 @@ export async function runAction(): Promise<void> {
   }
 
   const result = await Runner.runAll(runnerOptions);
+
+  const terminalReport = renderTerminalReport(result.score);
+  console.log(terminalReport);
 
   const markdownReport = renderMarkdownReport(result.score);
   const jsonReportStr = formatJsonReport(result.score, result.report.config, false);

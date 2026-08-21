@@ -42,7 +42,8 @@ export async function runBuildCheck(
 ): Promise<CheckResult> {
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.build;
-  const buildCommand = context.detectedFramework.buildCommand.trim();
+  const framework = (context.detectedFramework as any)?.detectedFramework || context.detectedFramework;
+  const buildCommand = framework?.buildCommand?.trim() ?? "";
 
   try {
     if (buildCommand.length === 0) {

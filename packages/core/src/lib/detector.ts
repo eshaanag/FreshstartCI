@@ -84,7 +84,7 @@ export async function detectProject(
 
   return {
     isNodeProject: true,
-    packageManager: packageManagerDetection.packageManager,
+    packageManager: packageManagerDetection.packageManager || "npm",
     detectedFramework,
     warnings: [...warnings, ...packageManagerDetection.warnings],
     packageJsonPath,

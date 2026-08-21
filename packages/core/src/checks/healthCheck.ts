@@ -33,7 +33,10 @@ export async function runHealthCheck(
   const startedAt = Date.now();
   const maxScore = context.config.scoring.weights.server;
   const healthConfig = context.config.checks.health;
-  const url = `http://localhost:${context.detectedFramework.port}${context.detectedFramework.healthPath || healthConfig.path}`;
+  const framework = (context.detectedFramework as any)?.detectedFramework || context.detectedFramework;
+  const port = framework?.port ?? 3000;
+  const healthPath = framework?.healthPath || healthConfig?.path || "/";
+  const url = `http://localhost:${port}${healthPath}`;
 
   try {
     const requestHealth = options.requestHealth ?? requestHealthEndpoint;
